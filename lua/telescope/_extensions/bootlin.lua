@@ -105,7 +105,7 @@ local identDefs = function(ident, opts)
           return {
             value = entry,
             display = entry[1] .. ":" .. entry[2] .. ":" .. entry[3],
-            ordinal = entry[3],
+            ordinal = entry[3] .. entry[1] .. entry[2],
           }
         end,
       }),
@@ -192,7 +192,7 @@ local identRefs = function(ident, opts)
           return {
             value = entry,
             display = entry[1] .. ":" .. entry[2],
-            ordinal = entry[1],
+            ordinal = entry[1] .. entry[2],
           }
         end,
       }),
@@ -239,6 +239,7 @@ local identRefs = function(ident, opts)
 end
 
 -- identRefs('malloc')
+identDefs('malloc')
 
 return telescope.register_extension({
   setup = function(_) end,
