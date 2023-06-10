@@ -1,18 +1,18 @@
 local has_telescope, telescope = pcall(require, "telescope")
 
 if not has_telescope then
-  error "Telescope interface requires telescope.nvim (https://github.com/nvim-telescope/telescope.nvim)"
+  error("Telescope interface requires telescope.nvim (https://github.com/nvim-telescope/telescope.nvim)")
 end
 
-local pickers = require "telescope.pickers"
-local finders = require "telescope.finders"
-local previewers = require "telescope.previewers"
+local pickers = require("telescope.pickers")
+local finders = require("telescope.finders")
+local previewers = require("telescope.previewers")
 local conf = require("telescope.config").values
-local actions = require "telescope.actions"
-local action_state = require "telescope.actions.state"
-local curl = require "plenary.curl"
+local actions = require("telescope.actions")
+local action_state = require("telescope.actions.state")
+local curl = require("plenary.curl")
 
-local host = os.getenv "NVIM_BOOTLIN_HOST"
+local host = os.getenv("NVIM_BOOTLIN_HOST")
 
 local function getIdent(project, ident, version)
   version = version or "latest"
@@ -72,32 +72,34 @@ end
 local identDefs = function(ident, opts)
   -- get information needed for environment variable
   local err = false
-  local project = os.getenv "NVIM_BOOTLIN_REST_PROJECT"
+  local project = os.getenv("NVIM_BOOTLIN_REST_PROJECT")
   if project == nil then
-    print "environment variable NVIM_BOOTLIN_REST_PROJECT is not set!"
+    print("environment variable NVIM_BOOTLIN_REST_PROJECT is not set!")
     err = true
   end
-  local tag = os.getenv "NVIM_BOOTLIN_REST_TAG"
+  local tag = os.getenv("NVIM_BOOTLIN_REST_TAG")
   if tag == nil then
-    print "environment variable NVIM_BOOTLIN_REST_TAG is not set!"
+    print("environment variable NVIM_BOOTLIN_REST_TAG is not set!")
     err = true
   end
-  local project_dir = os.getenv "NVIM_BOOTLIN_REST_PROJECT_DIR"
+  local project_dir = os.getenv("NVIM_BOOTLIN_REST_PROJECT_DIR")
   if project_dir == nil then
-    print "environment variable NVIM_BOOTLIN_REST_PROJECT_DIR is not set!"
+    print("environment variable NVIM_BOOTLIN_REST_PROJECT_DIR is not set!")
     err = true
   end
-  if os.getenv "NVIM_BOOTLIN_HOST" == nil then
-    print "environment variable NVIM_BOOTLIN_HOST is not set!"
+  if os.getenv("NVIM_BOOTLIN_HOST") == nil then
+    print("environment variable NVIM_BOOTLIN_HOST is not set!")
     err = true
   end
   -- FIXME: use a better way..
   project_dir = project_dir .. "/"
-  if err then return end
+  if err then
+    return
+  end
   pickers
     .new(opts, {
       prompt_title = ident .. "'s references",
-      finder = finders.new_table {
+      finder = finders.new_table({
         results = getIdentDefsEntry(project, ident, tag),
         entry_maker = function(entry)
           return {
@@ -106,7 +108,7 @@ local identDefs = function(ident, opts)
             ordinal = entry[3],
           }
         end,
-      },
+      }),
       sorter = conf.generic_sorter(opts),
       attach_mappings = function(prompt_bufnr, map)
         actions.select_default:replace(function()
@@ -120,7 +122,7 @@ local identDefs = function(ident, opts)
         end)
         return true
       end,
-      previewer = previewers.new_termopen_previewer {
+      previewer = previewers.new_termopen_previewer({
         title = "Definitions Preview",
         dyn_title = function(_, entry)
           return entry.value[1] .. " preview"
@@ -149,7 +151,7 @@ local identDefs = function(ident, opts)
           return { "bat", "--line-range", start .. ":" .. finish, "--highlight-line", lnum, file_path }
           -- return maker(p, lnum, start, finish)
         end,
-      },
+      }),
     })
     :find()
 end
@@ -157,32 +159,34 @@ end
 local identRefs = function(ident, opts)
   -- get information needed for environment variable
   local err = false
-  local project = os.getenv "NVIM_BOOTLIN_REST_PROJECT"
+  local project = os.getenv("NVIM_BOOTLIN_REST_PROJECT")
   if project == nil then
-    print "environment variable NVIM_BOOTLIN_REST_PROJECT is not set!"
+    print("environment variable NVIM_BOOTLIN_REST_PROJECT is not set!")
     err = true
   end
-  local tag = os.getenv "NVIM_BOOTLIN_REST_TAG"
+  local tag = os.getenv("NVIM_BOOTLIN_REST_TAG")
   if tag == nil then
-    print "environment variable NVIM_BOOTLIN_REST_TAG is not set!"
+    print("environment variable NVIM_BOOTLIN_REST_TAG is not set!")
     err = true
   end
-  local project_dir = os.getenv "NVIM_BOOTLIN_REST_PROJECT_DIR"
+  local project_dir = os.getenv("NVIM_BOOTLIN_REST_PROJECT_DIR")
   if project_dir == nil then
-    print "environment variable NVIM_BOOTLIN_REST_PROJECT_DIR is not set!"
+    print("environment variable NVIM_BOOTLIN_REST_PROJECT_DIR is not set!")
     err = true
   end
-  if os.getenv "NVIM_BOOTLIN_HOST" == nil then
-    print "environment variable NVIM_BOOTLIN_HOST is not set!"
+  if os.getenv("NVIM_BOOTLIN_HOST") == nil then
+    print("environment variable NVIM_BOOTLIN_HOST is not set!")
     err = true
   end
   -- FIXME: use a better way..
   project_dir = project_dir .. "/"
-  if err then return end
+  if err then
+    return
+  end
   pickers
     .new(opts, {
       prompt_title = ident .. "'s references",
-      finder = finders.new_table {
+      finder = finders.new_table({
         results = getIdentRefsEntry(project, ident, tag),
         entry_maker = function(entry)
           return {
@@ -191,7 +195,7 @@ local identRefs = function(ident, opts)
             ordinal = entry[1],
           }
         end,
-      },
+      }),
       sorter = conf.generic_sorter(opts),
       attach_mappings = function(prompt_bufnr, map)
         actions.select_default:replace(function()
@@ -200,7 +204,7 @@ local identRefs = function(ident, opts)
         end)
         return true
       end,
-      previewer = previewers.new_termopen_previewer {
+      previewer = previewers.new_termopen_previewer({
         title = "References Preview",
         dyn_title = function(_, entry)
           return entry.value[1] .. " preview"
@@ -229,18 +233,17 @@ local identRefs = function(ident, opts)
           return { "bat", "--line-range", start .. ":" .. finish, "--highlight-line", lnum, file_path }
           -- return maker(p, lnum, start, finish)
         end,
-      },
+      }),
     })
     :find()
 end
 
 -- identRefs('malloc')
 
-return telescope.register_extension {
-  setup = function(_)
-  end,
+return telescope.register_extension({
+  setup = function(_) end,
   exports = {
     bootlinElixirReferences = identRefs,
     bootlinElixirDefinitions = identDefs,
   },
-}
+})
