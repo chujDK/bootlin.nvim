@@ -43,6 +43,7 @@ local function getIdentRefsEntry(project, ident, version)
   local references = ident_info.references
   local result = {}
 
+  if references == nil then return result end
   for _, v in pairs(references) do
     local lines = split(v.line, ",")
     for _, l in pairs(lines) do
@@ -56,10 +57,11 @@ end
 local function getIdentDefsEntry(project, ident, version)
   -- get the info
   local ident_info = getIdent(project, ident, version)
-  local references = ident_info.definitions
+  local definitions = ident_info.definitions
   local result = {}
 
-  for _, v in pairs(references) do
+  if definitions == nil then return result end
+  for _, v in pairs(definitions) do
     local lines = split(v.line, ",")
     for _, l in pairs(lines) do
       table.insert(result, { v.path, l, v.type })
