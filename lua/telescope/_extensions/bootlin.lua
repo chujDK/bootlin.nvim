@@ -202,7 +202,12 @@ local identRefs = function(ident, opts)
       attach_mappings = function(prompt_bufnr, map)
         actions.select_default:replace(function()
           actions.close(prompt_bufnr)
-          local selection = action_state.get_selected_entry()
+          local entry = action_state.get_selected_entry()
+          local file_path = project_dir .. entry.value[1]
+          local lnum = tonumber(entry.value[2]) or 0
+          vim.cmd("e " .. file_path)
+          vim.cmd(":" .. lnum)
+          return true
         end)
         return true
       end,
