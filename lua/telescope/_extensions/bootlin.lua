@@ -20,7 +20,9 @@ local function getIdent(project, ident, version)
   if result.status == 200 then
     return vim.json.decode(result.body)
   else
-    return "failed to retrieve"
+    -- vim.notify(result)
+    vim.notify("failed to connect to bootlin host..", vim.log.levels.ERROR)
+    return {}
   end
 end
 
