@@ -73,33 +73,51 @@ local function getIdentDefsEntry(project, ident, version)
   return result
 end
 
-local identDefs = function(ident, opts)
-  -- get information needed for environment variable
-  local err = false
+local function getEnv()
   local project = os.getenv("NVIM_BOOTLIN_REST_PROJECT")
+  local err = false
   if project == nil then
-    print("environment variable NVIM_BOOTLIN_REST_PROJECT is not set!")
+    vim.notify("environment variable NVIM_BOOTLIN_REST_PROJECT is not set!", vim.log.levels.ERROR)
     err = true
   end
   local tag = os.getenv("NVIM_BOOTLIN_REST_TAG")
   if tag == nil then
-    print("environment variable NVIM_BOOTLIN_REST_TAG is not set!")
+    vim.notify("environment variable NVIM_BOOTLIN_REST_TAG is not set!", vim.log.levels.ERROR)
     err = true
   end
   local project_dir = os.getenv("NVIM_BOOTLIN_REST_PROJECT_DIR")
   if project_dir == nil then
-    print("environment variable NVIM_BOOTLIN_REST_PROJECT_DIR is not set!")
+    vim.notify("environment variable NVIM_BOOTLIN_REST_PROJECT_DIR is not set!", vim.log.levels.ERROR)
     err = true
   end
   if os.getenv("NVIM_BOOTLIN_HOST") == nil then
-    print("environment variable NVIM_BOOTLIN_HOST is not set!")
+    vim.notify("environment variable NVIM_BOOTLIN_HOST is not set!", vim.log.levels.ERROR)
     err = true
   end
+
   -- FIXME: use a better way..
-  project_dir = project_dir .. "/"
-  if err then
+  if project_dir ~= nil then
+    project_dir = project_dir .. "/"
+  end
+
+  return {
+    ["project"] = project,
+    ["tag"] = tag,
+    ["project_dir"] = project_dir,
+    ["err"] = err,
+  }
+end
+
+local identDefs = function(ident, opts)
+  -- get information needed for environment variable
+  local env = getEnv()
+  if env.err then
     return
   end
+  local project = env.project
+  local tag = env.tag
+  local project_dir = env.project_dir
+
   pickers
     .new(opts, {
       prompt_title = ident .. "'s references",
@@ -162,31 +180,14 @@ end
 
 local identRefs = function(ident, opts)
   -- get information needed for environment variable
-  local err = false
-  local project = os.getenv("NVIM_BOOTLIN_REST_PROJECT")
-  if project == nil then
-    print("environment variable NVIM_BOOTLIN_REST_PROJECT is not set!")
-    err = true
-  end
-  local tag = os.getenv("NVIM_BOOTLIN_REST_TAG")
-  if tag == nil then
-    print("environment variable NVIM_BOOTLIN_REST_TAG is not set!")
-    err = true
-  end
-  local project_dir = os.getenv("NVIM_BOOTLIN_REST_PROJECT_DIR")
-  if project_dir == nil then
-    print("environment variable NVIM_BOOTLIN_REST_PROJECT_DIR is not set!")
-    err = true
-  end
-  if os.getenv("NVIM_BOOTLIN_HOST") == nil then
-    print("environment variable NVIM_BOOTLIN_HOST is not set!")
-    err = true
-  end
-  -- FIXME: use a better way..
-  project_dir = project_dir .. "/"
-  if err then
+  local env = getEnv()
+  if env.err then
     return
   end
+  local project = env.project
+  local tag = env.tag
+  local project_dir = env.project_dir
+
   pickers
     .new(opts, {
       prompt_title = ident .. "'s references",
