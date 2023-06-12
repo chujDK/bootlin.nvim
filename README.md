@@ -52,3 +52,32 @@ search  of `<ident>`
 ```vim
 :lua require('telescope').extensions.bootlin.bootlinElixirDefinitions('<ident>')
 ```
+
+
+## example
+
+I have always wanted to read the Linux source code without having to build it first and then use lsp to read it. I want to be able to simply type the version number and start reading whenever I want. So, I have created a shell script:
+
+```bash
+#!/usr/bin/env bash
+
+project_dir=/home/chuj/projects/c/linux/
+tag=`git -C $project_dir tag | tac | fzf --query 'v' --prompt "chose a tag:"`
+git -C $project_dir checkout $tag
+
+NVIM_BOOTLIN_HOST='http://172.17.0.2' \
+  NVIM_BOOTLIN_REST_PROJECT=linux \
+  NVIM_BOOTLIN_REST_PROJECT_DIR=$project_dir \
+  NVIM_BOOTLIN_REST_TAG=$tag \
+  NVIM_LSP_C_SUPPRESS=1 \
+  NVIM_BOOTLIN_ENABLE=1 \
+  BAT_THEME="Visual Studio Dark+" nvim -R -c ":cd $project_dir"
+```
+
+Save this as `bootlin_nvim_read_linux`.
+
+Then bind `gd` and `gr` to search defs/refs.
+
+Here goes the demo:
+
+![bootlin-nvim-demo](https://github.com/chujDK/bootlin.nvim/assets/32593305/a92860a3-145a-4a42-a57c-15425e15f505)
