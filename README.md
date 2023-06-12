@@ -21,12 +21,7 @@ lazy {
 
 currently, the previewer is using [bat](https://github.com/sharkdp/bat) to provide syntax highlighting and line highlighting
 
-```lua
-    ...
-    return { "bat", "--line-range", start .. ":" .. finish, "--highlight-line", lnum, file_path }
-```
-
-so this is needed for preview the code in the telescope window.
+so `bat` is needed for preview the code in the telescope window.
 
 needless to say, [telescope.nvim](https://github.com/nvim-telescope/telescope.nvim) is needed too.
 
