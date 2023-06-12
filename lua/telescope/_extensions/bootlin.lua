@@ -164,7 +164,6 @@ local identDefs = function(ident, opts)
   end
   local project = env.project
   local tag = env.tag
-  local project_dir = env.project_dir
 
   pickers
     .new(opts, {
@@ -194,7 +193,6 @@ local identRefs = function(ident, opts)
   end
   local project = env.project
   local tag = env.tag
-  local project_dir = env.project_dir
 
   pickers
     .new(opts, {
