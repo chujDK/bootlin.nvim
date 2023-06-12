@@ -249,7 +249,7 @@ local identRefs = function(ident, opts)
 end
 
 -- identRefs('malloc')
-identDefs('malloc')
+-- identDefs('malloc')
 
 return telescope.register_extension({
   setup = function(_) end,
