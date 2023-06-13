@@ -78,6 +78,8 @@ Save this as `bootlin_nvim_read_linux`.
 
 Then bind `gd` and `gr` to search defs/refs.
 
+*Note: You may find that, unlike lsp, gd can only search for global definitions in this case. This is because lsp can intelligently recognize whether ident is global or local, while tag-based methods require manual selection of whether to search for local or global definitions. It is recommended to map gD to gd, so that you can use the gD key to search for local definitions using Vim's built-in regular expression search method.*
+
 Here goes the demo:
 
 ![bootlin-nvim-demo](https://github.com/chujDK/bootlin.nvim/assets/32593305/a92860a3-145a-4a42-a57c-15425e15f505)
