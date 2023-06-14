@@ -4,6 +4,7 @@ if not has_telescope then
   error("Telescope interface requires telescope.nvim (https://github.com/nvim-telescope/telescope.nvim)")
 end
 
+local has_devicons, devicons = pcall(require, "nvim-web-devicons")
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
 local previewers = require("telescope.previewers")
@@ -11,6 +12,8 @@ local conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local curl = require("plenary.curl")
+local os_path_sep = require "plenary.path".path.sep
+local entry_display = require "telescope.pickers.entry_display"
 
 local function getEnv()
   local project = os.getenv("NVIM_BOOTLIN_REST_PROJECT")
@@ -219,6 +222,31 @@ local identDefs = function(ident, opts)
     :find()
 end
 
+local refsDisplayer = entry_display.create {
+  separator = "",
+  hl_chars = { [os_path_sep] = "TelescopePathSeparator" },
+  items = (function()
+    local i = {}
+    if has_devicons then
+      table.insert(i, { width = 2 })
+    end
+    table.insert(i, { remaining = true })
+    return i
+  end)(),
+}
+
+local makeRefsDispalyer = function(e)
+  return refsDisplayer((function()
+    local i = {}
+    if has_devicons then
+      table.insert(i, { devicons.get_icon(e.value.path, string.match(e.value.path, "%a+$"), { default = true }) })
+    end
+    table.insert(i, { e.value.path .. ":" .. e.value.line, "File" })
+
+    return i
+  end)())
+end
+
 local identRefs = function(ident, opts)
   -- get information needed for environment variable
   if env.err then
@@ -236,7 +264,7 @@ local identRefs = function(ident, opts)
         entry_maker = function(entry)
           return {
             value = entry,
-            display = entry.path .. ":" .. entry.line,
+            display = makeRefsDispalyer,
             ordinal = entry.path,
           }
         end,
