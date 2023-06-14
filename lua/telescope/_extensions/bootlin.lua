@@ -167,14 +167,14 @@ local identDefs = function(ident, opts)
 
   pickers
     .new(opts, {
-      prompt_title = ident .. "'s references",
+      prompt_title = ident .. "'s definitions",
       finder = finders.new_table({
         results = getIdentDefsEntry(project, ident, tag),
         entry_maker = function(entry)
           return {
             value = entry,
             display = entry[1] .. ":" .. entry[2] .. ":" .. entry[3],
-            ordinal = entry[3] .. entry[1] .. entry[2],
+            ordinal = entry[1] -- filename
           }
         end,
       }),
@@ -203,7 +203,7 @@ local identRefs = function(ident, opts)
           return {
             value = entry,
             display = entry[1] .. ":" .. entry[2],
-            ordinal = entry[1] .. entry[2],
+            ordinal = entry[1] --filename
           }
         end,
       }),
