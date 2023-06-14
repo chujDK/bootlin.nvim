@@ -98,6 +98,13 @@ local function getIdentRefsEntry(project, ident, version)
   return result
 end
 
+local identDefTypeOrd = {
+  ["function"] = 99,
+  ["macro"] = 98,
+  ["prototype"] = 97,
+  ["member"] = 97,
+}
+
 local function getIdentDefsEntry(project, ident, version)
   -- get the info
   local ident_info = getIdent(project, ident, version)
@@ -117,6 +124,26 @@ local function getIdentDefsEntry(project, ident, version)
       })
     end
   end
+
+  -- sort the result
+  table.sort(result, function (a, b)
+    local typeOrdOf = function (entry)
+      if identDefTypeOrd[entry.type] ~= nil then
+        return identDefTypeOrd[entry.type]
+      else
+        return 0
+      end
+    end
+
+    if typeOrdOf(a) == typeOrdOf(b) then
+      if a.path == b.path then
+        return a.line < b.line
+      else
+        return a.path < b.path
+      end
+    else return typeOrdOf(a) > typeOrdOf(b)
+    end
+  end)
 
   return result
 end
