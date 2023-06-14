@@ -12,8 +12,8 @@ local conf = require("telescope.config").values
 local actions = require("telescope.actions")
 local action_state = require("telescope.actions.state")
 local curl = require("plenary.curl")
-local os_path_sep = require "plenary.path".path.sep
-local entry_display = require "telescope.pickers.entry_display"
+local os_path_sep = require("plenary.path").path.sep
+local entry_display = require("telescope.pickers.entry_display")
 
 local function getEnv()
   local project = os.getenv("NVIM_BOOTLIN_REST_PROJECT")
@@ -93,7 +93,7 @@ local function getIdentRefsEntry(project, ident, version)
     for _, l in pairs(lines) do
       table.insert(result, {
         path = v.path,
-        line = l
+        line = l,
       })
     end
   end
@@ -129,8 +129,8 @@ local function getIdentDefsEntry(project, ident, version)
   end
 
   -- sort the result
-  table.sort(result, function (a, b)
-    local typeOrdOf = function (entry)
+  table.sort(result, function(a, b)
+    local typeOrdOf = function(entry)
       if identDefTypeOrd[entry.type] ~= nil then
         return identDefTypeOrd[entry.type]
       else
@@ -144,7 +144,8 @@ local function getIdentDefsEntry(project, ident, version)
       else
         return a.path < b.path
       end
-    else return typeOrdOf(a) > typeOrdOf(b)
+    else
+      return typeOrdOf(a) > typeOrdOf(b)
     end
   end)
 
@@ -202,6 +203,33 @@ local identDefs = function(ident, opts)
   local project = env.project
   local tag = env.tag
 
+  local displayer = entry_display.create({
+    separator = "",
+    hl_chars = { [os_path_sep] = "TelescopePathSeparator" },
+    items = (function()
+      local i = {}
+      if has_devicons then
+        table.insert(i, { width = 2 })
+      end
+      table.insert(i, { width = 10 })
+      table.insert(i, { remaining = true })
+      return i
+    end)(),
+  })
+
+  local make_dispalyer = function(e)
+    return displayer((function()
+      local i = {}
+      if has_devicons then
+        table.insert(i, { devicons.get_icon(e.value.path, string.match(e.value.path, "%a+$"), { default = true }) })
+      end
+      table.insert(i, { e.value.type, "TelescopeResultsComment" })
+      table.insert(i, { e.value.path .. ":" .. e.value.line, "File" })
+
+      return i
+    end)())
+  end
+
   pickers
     .new(opts, {
       prompt_title = ident .. "'s definitions",
@@ -210,7 +238,7 @@ local identDefs = function(ident, opts)
         entry_maker = function(entry)
           return {
             value = entry,
-            display = entry.path .. ":" .. entry.line .. ":" .. entry.type,
+            display = make_dispalyer,
             ordinal = entry.path,
           }
         end,
@@ -220,31 +248,6 @@ local identDefs = function(ident, opts)
       previewer = bootline_previewer,
     })
     :find()
-end
-
-local refsDisplayer = entry_display.create {
-  separator = "",
-  hl_chars = { [os_path_sep] = "TelescopePathSeparator" },
-  items = (function()
-    local i = {}
-    if has_devicons then
-      table.insert(i, { width = 2 })
-    end
-    table.insert(i, { remaining = true })
-    return i
-  end)(),
-}
-
-local makeRefsDispalyer = function(e)
-  return refsDisplayer((function()
-    local i = {}
-    if has_devicons then
-      table.insert(i, { devicons.get_icon(e.value.path, string.match(e.value.path, "%a+$"), { default = true }) })
-    end
-    table.insert(i, { e.value.path .. ":" .. e.value.line, "File" })
-
-    return i
-  end)())
 end
 
 local identRefs = function(ident, opts)
@@ -256,6 +259,31 @@ local identRefs = function(ident, opts)
   local project = env.project
   local tag = env.tag
 
+  local displayer = entry_display.create({
+    separator = "",
+    hl_chars = { [os_path_sep] = "TelescopePathSeparator" },
+    items = (function()
+      local i = {}
+      if has_devicons then
+        table.insert(i, { width = 2 })
+      end
+      table.insert(i, { remaining = true })
+      return i
+    end)(),
+  })
+
+  local make_dispalyer = function(e)
+    return displayer((function()
+      local i = {}
+      if has_devicons then
+        table.insert(i, { devicons.get_icon(e.value.path, string.match(e.value.path, "%a+$"), { default = true }) })
+      end
+      table.insert(i, { e.value.path .. ":" .. e.value.line, "File" })
+
+      return i
+    end)())
+  end
+
   pickers
     .new(opts, {
       prompt_title = ident .. "'s references",
@@ -264,7 +292,7 @@ local identRefs = function(ident, opts)
         entry_maker = function(entry)
           return {
             value = entry,
-            display = makeRefsDispalyer,
+            display = make_dispalyer,
             ordinal = entry.path,
           }
         end,
@@ -276,8 +304,8 @@ local identRefs = function(ident, opts)
     :find()
 end
 
--- identRefs('malloc')
--- identDefs('malloc')
+-- identRefs("malloc")
+-- identDefs("malloc")
 
 return telescope.register_extension({
   setup = function(_) end,
