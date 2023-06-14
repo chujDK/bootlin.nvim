@@ -88,7 +88,10 @@ local function getIdentRefsEntry(project, ident, version)
   for _, v in pairs(references) do
     local lines = split(v.line, ",")
     for _, l in pairs(lines) do
-      table.insert(result, { v.path, l })
+      table.insert(result, {
+        path = v.path,
+        line = l
+      })
     end
   end
 
@@ -107,7 +110,11 @@ local function getIdentDefsEntry(project, ident, version)
   for _, v in pairs(definitions) do
     local lines = split(v.line, ",")
     for _, l in pairs(lines) do
-      table.insert(result, { v.path, l, v.type })
+      table.insert(result, {
+        path = v.path,
+        line = l,
+        type = v.type,
+      })
     end
   end
 
@@ -118,8 +125,8 @@ local function bootlin_attach_mappings(prompt_bufnr, map)
   actions.select_default:replace(function()
     actions.close(prompt_bufnr)
     local entry = action_state.get_selected_entry()
-    local file_path = env.project_dir .. entry.value[1]
-    local lnum = tonumber(entry.value[2]) or 0
+    local file_path = env.project_dir .. entry.value.path
+    local lnum = tonumber(entry.value.line) or 0
     vim.cmd("e " .. file_path)
     vim.cmd(":" .. lnum)
     return true
@@ -130,14 +137,14 @@ end
 local bootline_previewer = previewers.new_termopen_previewer({
   title = "Ident Occurs Preview",
   dyn_title = function(_, entry)
-    return entry.value[1] .. " preview"
+    return entry.value.path .. " preview"
   end,
 
   get_command = function(entry, status)
     local win_id = status.preview_win
     local height = vim.api.nvim_win_get_height(win_id)
 
-    local file_path = env.project_dir .. entry.value[1]
+    local file_path = env.project_dir .. entry.value.path
     if file_path == nil or file_path == "" then
       return
     end
@@ -145,7 +152,7 @@ local bootline_previewer = previewers.new_termopen_previewer({
       return
     end
 
-    local lnum = tonumber(entry.value[2]) or 0
+    local lnum = tonumber(entry.value.line) or 0
 
     local context = math.floor(height / 2)
     local start = math.max(0, lnum - context)
@@ -173,8 +180,8 @@ local identDefs = function(ident, opts)
         entry_maker = function(entry)
           return {
             value = entry,
-            display = entry[1] .. ":" .. entry[2] .. ":" .. entry[3],
-            ordinal = entry[1] -- filename
+            display = entry.path .. ":" .. entry.line .. ":" .. entry.type,
+            ordinal = entry.path,
           }
         end,
       }),
@@ -202,8 +209,8 @@ local identRefs = function(ident, opts)
         entry_maker = function(entry)
           return {
             value = entry,
-            display = entry[1] .. ":" .. entry[2],
-            ordinal = entry[1] --filename
+            display = entry.path .. ":" .. entry.line,
+            ordinal = entry.path,
           }
         end,
       }),
