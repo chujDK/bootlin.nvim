@@ -185,7 +185,7 @@ local bootline_previewer = previewers.new_termopen_previewer({
 
     local lnum = tonumber(entry.value.line) or 0
 
-    local context = math.floor(height / 2)
+    local context = math.floor((height - 4) / 2)
     local start = math.max(0, lnum - context)
     local finish = lnum + context
 
