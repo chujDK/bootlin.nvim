@@ -103,7 +103,9 @@ end
 
 local identDefTypeOrd = {
   ["function"] = 99,
+  ["struct"] = 99,
   ["macro"] = 98,
+  ["variable"] = 98,
   ["prototype"] = 97,
   ["member"] = 97,
 }
