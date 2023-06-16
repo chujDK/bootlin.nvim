@@ -205,8 +205,8 @@ local identDefs = function(ident, opts)
 
   local entries = getIdentDefsEntry(project, ident, tag)
   if opts.auto_jump == true then
-    if #entries == 1 and entries[1].type == "function" then
-      -- if only one definition is found and it is a function, then we dircetly jump to there
+    if #entries == 1  then
+      -- if only one definition is found, we dircetly jump to there
       local entriy = entries[1]
       local file_path = env.project_dir .. entriy.path
       local lnum = tonumber(entriy.line) or 0
