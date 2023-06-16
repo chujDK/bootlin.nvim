@@ -203,6 +203,19 @@ local identDefs = function(ident, opts)
   local project = env.project
   local tag = env.tag
 
+  local entries = getIdentDefsEntry(project, ident, tag)
+  if opts.auto_jump == true then
+    if #entries == 1 and entries[1].type == "function" then
+      -- if only one definition is found and it is a function, then we dircetly jump to there
+      local entriy = entries[1]
+      local file_path = env.project_dir .. entriy.path
+      local lnum = tonumber(entriy.line) or 0
+      vim.cmd("e " .. file_path)
+      vim.cmd(":" .. lnum)
+      return
+    end
+  end
+
   local displayer = entry_display.create({
     separator = "",
     hl_chars = { [os_path_sep] = "TelescopePathSeparator" },
@@ -234,7 +247,7 @@ local identDefs = function(ident, opts)
     .new(opts, {
       prompt_title = ident .. "'s definitions",
       finder = finders.new_table({
-        results = getIdentDefsEntry(project, ident, tag),
+        results = entries,
         entry_maker = function(entry)
           return {
             value = entry,
@@ -304,8 +317,8 @@ local identRefs = function(ident, opts)
     :find()
 end
 
--- identRefs("malloc")
--- identDefs("malloc")
+-- identRefs("malloc", require("telescope.themes").get_dropdown({width = 0.3}))
+-- identDefs("scm_send", require("telescope.themes").get_dropdown({ layout_config = { width = 0.80, height = 0.9 }, layout_strategy = "vertical", border = true, auto_jump = true }))
 
 return telescope.register_extension({
   setup = function(_) end,

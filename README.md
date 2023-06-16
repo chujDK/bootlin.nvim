@@ -53,6 +53,11 @@ search  of `<ident>`
 :lua require('telescope').extensions.bootlin.bootlinElixirDefinitions('<ident>')
 ```
 
+also, you can pass `opts` after the `<ident>`, like this
+
+```vim
+:lua require('telescope').extensions.bootlin.bootlinElixirDefinitions('malloc', { <your opts> })
+```
 
 ## example
 
