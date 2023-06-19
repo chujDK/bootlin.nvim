@@ -206,15 +206,41 @@ local identDefs = function(ident, opts)
   local tag = env.tag
 
   local entries = getIdentDefsEntry(project, ident, tag)
+
   if opts.auto_jump == true then
-    if #entries == 1  then
-      -- if only one definition is found, we dircetly jump to there
-      local entriy = entries[1]
-      local file_path = env.project_dir .. entriy.path
-      local lnum = tonumber(entriy.line) or 0
+    local jump_to_file = function(entry)
+      local file_path = env.project_dir .. entry.path
+      local lnum = tonumber(entry.line) or 0
       vim.cmd("e " .. file_path)
       vim.cmd(":" .. lnum)
+    end
+
+    if #entries == 1 then
+      -- if only one definition is found, we dircetly jump to there
+      local entry = entries[1]
+      jump_to_file(entry)
       return
+    elseif #entries < 5 then
+      local sum_of_type = {}
+      local target_entry = {}
+      for _, v in pairs(entries) do
+        if sum_of_type[v.type] == nil then
+          sum_of_type[v.type] = 1
+          target_entry[v.type] = v
+        else
+          sum_of_type[v.type] = sum_of_type[v.type] + 1
+        end
+      end
+
+      if sum_of_type["function"] == 1 then
+        jump_to_file(target_entry["function"])
+        return
+      end
+
+      if sum_of_type["struct"] == 1 then
+        jump_to_file(target_entry["struct"])
+        return
+      end
     end
   end
 
