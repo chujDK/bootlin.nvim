@@ -223,10 +223,10 @@ local identDefs = function(ident, opts)
     hl_chars = { [os_path_sep] = "TelescopePathSeparator" },
     items = (function()
       local i = {}
+      table.insert(i, { width = 10 })
       if has_devicons then
         table.insert(i, { width = 2 })
       end
-      table.insert(i, { width = 10 })
       table.insert(i, { remaining = true })
       return i
     end)(),
@@ -235,10 +235,10 @@ local identDefs = function(ident, opts)
   local make_dispalyer = function(e)
     return displayer((function()
       local i = {}
+      table.insert(i, { e.value.type, "TelescopeResultsComment" })
       if has_devicons then
         table.insert(i, { devicons.get_icon(e.value.path, string.match(e.value.path, "%a+$"), { default = true }) })
       end
-      table.insert(i, { e.value.type, "TelescopeResultsComment" })
       table.insert(i, { e.value.path .. ":" .. e.value.line, "File" })
 
       return i
