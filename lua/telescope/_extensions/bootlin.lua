@@ -196,7 +196,8 @@ local bootline_previewer = previewers.new_termopen_previewer({
   end,
 })
 
-local identDefs = function(ident, opts)
+local identDefs = function(ident, opts, fallback_function)
+  opts = opts or {}
   -- get information needed for environment variable
   if env.err then
     vim.notify("you need set the correct environment variable!", vim.log.levels.ERROR)
@@ -206,6 +207,15 @@ local identDefs = function(ident, opts)
   local tag = env.tag
 
   local entries = getIdentDefsEntry(project, ident, tag)
+
+  if #entries == 0 then
+    if fallback_function then
+      return fallback_function()
+    else
+      vim.notify("can't find definition of " .. ident, vim.log.levels.WARN)
+      return false
+    end
+  end
 
   if opts.auto_jump == true then
     local jump_to_file = function(entry)
@@ -291,7 +301,8 @@ local identDefs = function(ident, opts)
     :find()
 end
 
-local identRefs = function(ident, opts)
+local identRefs = function(ident, opts, fallback_function)
+  opts = opts or {}
   -- get information needed for environment variable
   if env.err then
     vim.notify("you need set the correct environment variable!", vim.log.levels.ERROR)
@@ -299,6 +310,17 @@ local identRefs = function(ident, opts)
   end
   local project = env.project
   local tag = env.tag
+
+  local entrise = getIdentRefsEntry(project, ident, tag)
+
+  if #entrise == 0 then
+    if fallback_function then
+      return fallback_function()
+    else
+      vim.notify("can't find references of " .. ident, vim.log.levels.WARN)
+      return false
+    end
+  end
 
   local displayer = entry_display.create({
     separator = "",
@@ -329,7 +351,7 @@ local identRefs = function(ident, opts)
     .new(opts, {
       prompt_title = ident .. "'s references",
       finder = finders.new_table({
-        results = getIdentRefsEntry(project, ident, tag),
+        results = entrise,
         entry_maker = function(entry)
           return {
             value = entry,
