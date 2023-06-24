@@ -62,6 +62,7 @@ local function getIdent(project, ident, version)
   else
     -- vim.notify(result)
     vim.notify("failed to connect to bootlin host..", vim.log.levels.ERROR)
+    vim.notify(vim.inspect.inspect(result), vim.log.levels.ERROR)
     return {}
   end
 end
